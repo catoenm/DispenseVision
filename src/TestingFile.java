@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 
 import org.opencv.core.Core;
@@ -26,6 +27,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
@@ -40,6 +42,7 @@ public class TestingFile{
 	static JLabel title;
 	static JLabel status;
 	static JList list;
+	static JProgressBar bar;
 	static JScrollPane scroller;
 	static BufferedImage image;
 	static VideoCapture camera;
@@ -92,6 +95,12 @@ public class TestingFile{
 		
 		makeButtons();
 		
+		bar = new JProgressBar();
+		bar.setSize(100, 20);
+		bar.setMaximum(2000);
+		bar.setMinimum(0);
+		bar.setForeground(Color.RED);
+		bar.setValue(1000);
 		
 		panel.add(title);
 		panel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -102,6 +111,7 @@ public class TestingFile{
 		panel.add(Box.createRigidArea(new Dimension(0, 20)));
 		panel.add(scroller);
 		panel.add(status);
+		panel.add(bar);
 		
 		gui_frame.add(panel);
 		gui_frame.setVisible(true);
@@ -199,8 +209,23 @@ public class TestingFile{
 		 Imgproc.cvtColor(comparison_frame, hsv_com_bw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.threshold(hsv_com_bw, hsv_com_bw,150,255, Imgproc.THRESH_BINARY);
 		 
-		 writeImage("hsv_ref_bw_image.png", hsv_ref_bw);
-		 writeImage("hsv_com_bw_image.png", hsv_com_bw);
+		 Imgproc.GaussianBlur(reference_frame, hsv_ref_rw, new Size(45, 45), 0);
+		 Imgproc.GaussianBlur(comparison_frame, hsv_com_rw, new Size(45, 45), 0);
+		 
+		 Imgproc.threshold(hsv_ref_bw, hsv_ref_rw,150,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_bw, hsv_com_rw,150,255, Imgproc.THRESH_BINARY);
+		 
+		 int erosionSize = 6;
+		 
+		 Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS, new Size(2 * erosionSize + 1, 2 * erosionSize + 1));
+		 
+//		 Imgproc.erode(reference_frame, hsv_ref_rw, element);
+//		 Imgproc.erode(comparison_frame,  hsv_com_rw, element);
+//		 
+//		 writeImage("hsv_ref_bw_image.png", hsv_ref_bw);
+//		 writeImage("hsv_com_bw_image.png", hsv_com_bw);
+//		 writeImage("hsv_ref_rw_image.png", hsv_ref_rw);
+//		 writeImage("hsv_com_rw_image.png", hsv_com_rw);
 		 
 		 Mat ref_hist = new Mat();
 		 Mat com_hist = new Mat();
@@ -244,6 +269,7 @@ public class TestingFile{
 			 status.setForeground(Color.RED);
 		 }
 		 
+		 bar.setValue((int) comVal);
 		 return comVal;
 	 }
 	 
