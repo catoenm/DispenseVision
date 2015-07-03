@@ -39,6 +39,7 @@ public class TestingFile{
 	static JButton button2;
 	static JButton next;
 	static JButton simulation;
+	static JButton openWebcam;
 	static JLabel title;
 	static JLabel status;
 	static JList list;
@@ -99,7 +100,7 @@ public class TestingFile{
 		bar.setSize(100, 20);
 		bar.setMaximum(2000);
 		bar.setMinimum(0);
-		bar.setForeground(Color.RED);
+		bar.setForeground(Color.BLACK);
 		bar.setValue(1000);
 		
 		panel.add(title);
@@ -108,6 +109,8 @@ public class TestingFile{
 		panel.add(button);
 		panel.add(Box.createRigidArea(new Dimension(0, 20)));
 		panel.add(button2);
+		panel.add(Box.createRigidArea(new Dimension(0, 20)));
+		panel.add(openWebcam);
 		panel.add(Box.createRigidArea(new Dimension(0, 20)));
 		panel.add(scroller);
 		panel.add(status);
@@ -141,8 +144,8 @@ public class TestingFile{
 	       default:  
 	         return null;  
 	     }  
-	     BufferedImage image2 = new BufferedImage(cols, rows, type);  
-	     image2.getRaster().setDataElements(0, 0, cols, rows, data);  
+	     BufferedImage image2 = new BufferedImage(cols, rows, type);
+	     image2.getRaster().setDataElements(0, 0, cols, rows, data);
 	     return image2;  
 	   }
 	 
@@ -167,7 +170,7 @@ public class TestingFile{
 	 }
 	 
 	 public static void takeComparisonPicture(){
-		 camera = new VideoCapture(0);
+		 camera = new VideoCapture(1);
 			camera.open(0);
 			if (!camera.isOpened())
 				System.out.println("Not Open");
@@ -186,18 +189,7 @@ public class TestingFile{
 		    camera.release();
 	 }
 	 
-	 public static boolean simulation(){
-		 output.add(0, "Started Simulation");
-		 output.add(0, "Make sure there are no objects in the dispense");
-		 while(!nextButtonPressed){
-			 nextButtonPressed = true;
-		 }
-		 output.add(0, "Taking reference image");
-		 
-		 return true;
-	 }
-	 
-	 public static double checkSimilarity(Mat largeImage, Mat smallImage){
+	 public static double checkSimilarity(){
 		 hsv_half_down = new Mat();
 		 hsv_ref_bw = new Mat();
 		 hsv_com_bw = new Mat();
@@ -329,8 +321,19 @@ public class TestingFile{
 						err.printStackTrace();
 					}
 				    
-				    output.add(0, "Histogram Comparison: " + Math.round(checkSimilarity(reference_frame, comparison_frame)));
+				    output.add(0, "Histogram Comparison: " + Math.round(checkSimilarity()));
 				    
+				}
+			});
+			
+			openWebcam = new JButton();
+			openWebcam.setText("          Open Webcam          ");
+			openWebcam.setSize(200, 50);
+			openWebcam.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					WebcamThread webcamThread = new WebcamThread();
+					webcamThread.start();
+					output.add(0, "Webcam Open");
 				}
 			});
 	 }
