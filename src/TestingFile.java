@@ -21,6 +21,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -58,6 +60,7 @@ public class TestingFile{
 	static Mat hsv_com_rw;
 	final static int NUMBER = 10;
 	static boolean nextButtonPressed = false;
+	static Font font;
 	
 	public static void main(String [] args) throws FontFormatException, IOException{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -76,7 +79,7 @@ public class TestingFile{
 		gui_frame.setTitle("DispenseVision");
 		
 		File file = new File("BAUHS93.ttf");
-		Font font = Font.createFont(Font.TRUETYPE_FONT, file);
+		font = Font.createFont(Font.TRUETYPE_FONT, file);
 		
 		title = new JLabel();
 		title.setText("Dispense Product Detection");
