@@ -204,15 +204,10 @@ public class TestingFile{
 		 Imgproc.cvtColor(comparison_frame, hsv_com_bw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.threshold(hsv_com_bw, hsv_com_bw,150,255, Imgproc.THRESH_BINARY);
 		 
-		 Imgproc.GaussianBlur(reference_frame, hsv_ref_rw, new Size(45, 45), 0);
-		 Imgproc.GaussianBlur(comparison_frame, hsv_com_rw, new Size(45, 45), 0);
-		 
-		 Imgproc.threshold(hsv_ref_bw, hsv_ref_rw,150,255, Imgproc.THRESH_BINARY);
-		 Imgproc.threshold(hsv_com_bw, hsv_com_rw,150,255, Imgproc.THRESH_BINARY);
-		 
-		 int erosionSize = 6;
-		 
-		 Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS, new Size(2 * erosionSize + 1, 2 * erosionSize + 1));
+		 Imgproc.cvtColor(reference_frame, hsv_ref_rw, Imgproc.COLOR_RGB2GRAY);
+		 Imgproc.cvtColor(comparison_frame, hsv_com_rw, Imgproc.COLOR_RGB2GRAY);
+		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw,160,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_rw, hsv_com_rw,160,255, Imgproc.THRESH_BINARY);
 		 
 //		 Imgproc.erode(reference_frame, hsv_ref_rw, element);
 //		 Imgproc.erode(comparison_frame,  hsv_com_rw, element);

@@ -1,7 +1,9 @@
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -9,12 +11,12 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.opencv.core.DMatch;
 import org.opencv.core.Mat;
@@ -30,8 +32,9 @@ public class WebcamThread implements Runnable{
 	Thread t;
 	static JFrame frame;
 	static WebcamPanel panel;
-	static JLabel label, status, title;
-	static BufferedImage image;
+	static JPanel [] subPanel;
+	static JLabel label, status, title, comparison;
+	static BufferedImage image, image2;
 	static JButton takeRefPic;
 	static Graphics g;
 	static boolean run;
@@ -69,8 +72,12 @@ public class WebcamThread implements Runnable{
 					
 					checkSimilarityRT();
 					image = TestingFile.matToBufferedImage(TestingFile.hsv_com_bw);
-					ImageIcon icon = new ImageIcon(image);
+					ImageIcon icon = new ImageIcon(getScaledImage(image, 320, 240));
 					label.setIcon(icon);
+					
+					image2 = TestingFile.matToBufferedImage(TestingFile.hsv_com_rw);
+					ImageIcon icon2 = new ImageIcon(getScaledImage(image2, 320, 240));
+					comparison.setIcon(icon2);
 				}
 			}
 		}
@@ -92,9 +99,9 @@ public class WebcamThread implements Runnable{
 	public void setup(){
 		frame = new JFrame();
 		frame.setVisible(true);
-		frame.setSize(700, 700);
+		frame.setSize(700, 500);
 		frame.setTitle("Webcam");
-		frame.setLocation(new Point(200, 200));
+		frame.setLocation(new Point(500, 0));
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	    frame.addWindowListener(new WindowAdapter() {
 	        @Override
@@ -117,20 +124,30 @@ public class WebcamThread implements Runnable{
 	    
 		label = new JLabel();
 //		label.setText("Hello");
+		comparison = new JLabel();
 		
 		status = new JLabel();
 		status.setText("STATUS");
 		status.setFont(new Font(status.getFont().getName(), Font.PLAIN, 24));
 		
+		subPanel = new JPanel [10];
+		for (int i = 0; i < 10; i++){
+			subPanel[i] = new JPanel();
+		}
+		subPanel[0].add(comparison);
+		subPanel[0].add(label);
+		subPanel[1] = new JPanel();
+		subPanel[1].add(title);
+		subPanel[2].add(takeRefPic);
+		subPanel[3].add(status);
+		
 		panel = new WebcamPanel();
 		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(title);
-		panel.add(Box.createRigidArea(new Dimension(0, 20)));
-		panel.add(takeRefPic);
-		panel.add(Box.createRigidArea(new Dimension(0, 20)));
-		panel.add(label);
-		panel.add(status);
+		panel.add(subPanel[1]);
+		panel.add(subPanel[2]);
+		panel.add(subPanel[0]);
+		panel.add(subPanel[3]);
 		frame.add(panel);
 	}
 	
@@ -236,5 +253,14 @@ public class WebcamThread implements Runnable{
 		if(count >= 4)
 			status.setText("No object present");
 		
+	}
+	
+	private BufferedImage getScaledImage(Image srcImg, int w, int h){
+	    BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+	    Graphics2D g2 = resizedImg.createGraphics();
+	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+	    g2.drawImage(srcImg, 0, 0, w, h, null);
+	    g2.dispose();
+	    return resizedImg;
 	}
 }
