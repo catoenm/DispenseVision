@@ -68,8 +68,7 @@ public class WebcamThread implements Runnable{
 					}
 					
 					checkSimilarityRT();
-
-					image = TestingFile.matToBufferedImage(TestingFile.comparison_frame);
+					image = TestingFile.matToBufferedImage(TestingFile.hsv_com_bw);
 					ImageIcon icon = new ImageIcon(image);
 					label.setIcon(icon);
 				}
