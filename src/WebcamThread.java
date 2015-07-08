@@ -69,7 +69,11 @@ public class WebcamThread implements Runnable{
 					
 					checkSimilarityRT();
 
+<<<<<<< HEAD
 					image = TestingFile.matToBufferedImage(TestingFile.hsv_com_bw);
+=======
+					image = TestingFile.matToBufferedImage(TestingFile.comparison_frame);
+>>>>>>> f9251d5ca60f51cf2d250b0c2052a53be4539c13
 					ImageIcon icon = new ImageIcon(image);
 					label.setIcon(icon);
 				}
@@ -144,7 +148,11 @@ public class WebcamThread implements Runnable{
 	public void checkSimilarityRT(){
 		similarity = TestingFile.checkSimilarity();
 		
+<<<<<<< HEAD
 		if (similarity < 100)
+=======
+		if (similarity < 150)
+>>>>>>> f9251d5ca60f51cf2d250b0c2052a53be4539c13
 			status.setText("No Object");
 		else
 			status.setText("Object Present");

@@ -255,7 +255,8 @@ public class TestingFile{
 		  }
 		 
 		 double base_base = Imgproc.compareHist( ref_hist, com_hist, 1);
-		 if (base_base > 100){
+		 
+		 if (base_base > 120){
 			 status.setText("Object");
 			 status.setForeground(Color.GREEN);
 		 }
