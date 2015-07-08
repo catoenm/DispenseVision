@@ -206,8 +206,8 @@ public class TestingFile{
 		 
 		 Imgproc.cvtColor(reference_frame, hsv_ref_rw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.cvtColor(comparison_frame, hsv_com_rw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw,160,255, Imgproc.THRESH_BINARY);
-		 Imgproc.threshold(hsv_com_rw, hsv_com_rw,160,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw,175,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_rw, hsv_com_rw,175,255, Imgproc.THRESH_BINARY);
 		 
 //		 Imgproc.erode(reference_frame, hsv_ref_rw, element);
 //		 Imgproc.erode(comparison_frame,  hsv_com_rw, element);
