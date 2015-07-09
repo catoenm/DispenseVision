@@ -33,8 +33,8 @@ public class WebcamThread implements Runnable{
 	static JFrame frame;
 	static WebcamPanel panel;
 	static JPanel [] subPanel;
-	static JLabel label, status, title, comparison;
-	static BufferedImage image, image2;
+	static JLabel label, status, title, comparison, dark_comparison;
+	static BufferedImage image, image2, image3;
 	static JButton takeRefPic;
 	static Graphics g;
 	static boolean run;
@@ -78,6 +78,10 @@ public class WebcamThread implements Runnable{
 					image2 = TestingFile.matToBufferedImage(TestingFile.hsv_com_rw);
 					ImageIcon icon2 = new ImageIcon(getScaledImage(image2, 320, 240));
 					comparison.setIcon(icon2);
+					
+					image3 = TestingFile.matToBufferedImage(TestingFile.hsv_com_dark);
+					ImageIcon icon3 = new ImageIcon(getScaledImage(image3, 320, 240));
+					dark_comparison.setIcon(icon3);
 				}
 			}
 		}
@@ -99,7 +103,7 @@ public class WebcamThread implements Runnable{
 	public void setup(){
 		frame = new JFrame();
 		frame.setVisible(true);
-		frame.setSize(700, 500);
+		frame.setSize(1000, 500);
 		frame.setTitle("Webcam");
 		frame.setLocation(new Point(500, 0));
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -125,7 +129,7 @@ public class WebcamThread implements Runnable{
 		label = new JLabel();
 //		label.setText("Hello");
 		comparison = new JLabel();
-		
+		dark_comparison = new JLabel();
 		status = new JLabel();
 		status.setText("STATUS");
 		status.setFont(new Font(status.getFont().getName(), Font.PLAIN, 24));
@@ -136,6 +140,7 @@ public class WebcamThread implements Runnable{
 		}
 		subPanel[0].add(comparison);
 		subPanel[0].add(label);
+		subPanel[0].add(dark_comparison);
 		subPanel[1] = new JPanel();
 		subPanel[1].add(title);
 		subPanel[2].add(takeRefPic);

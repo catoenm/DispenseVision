@@ -62,6 +62,8 @@ public class TestingFile{
 	static Mat hsv_com_bw;
 	static Mat hsv_ref_rw;
 	static Mat hsv_com_rw;
+	static Mat hsv_ref_dark;
+	static Mat hsv_com_dark;
 	final static int NUMBER = 10;
 	static boolean nextButtonPressed = false;
 	static Font font;
@@ -223,6 +225,8 @@ public class TestingFile{
 		 hsv_com_bw = new Mat();
 		 hsv_ref_rw = new Mat();
 		 hsv_com_rw = new Mat();
+		 hsv_ref_dark = new Mat();
+		 hsv_com_dark = new Mat();
 		 
 		 Imgproc.cvtColor(reference_frame, hsv_ref_bw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.threshold(hsv_ref_bw, hsv_ref_bw,150,255, Imgproc.THRESH_BINARY);
@@ -233,6 +237,11 @@ public class TestingFile{
 		 Imgproc.cvtColor(comparison_frame, hsv_com_rw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw,175,255, Imgproc.THRESH_BINARY);
 		 Imgproc.threshold(hsv_com_rw, hsv_com_rw,175,255, Imgproc.THRESH_BINARY);
+		 
+		 Imgproc.cvtColor(reference_frame, hsv_ref_dark, Imgproc.COLOR_RGB2GRAY);
+		 Imgproc.cvtColor(comparison_frame, hsv_com_dark, Imgproc.COLOR_RGB2GRAY);
+		 Imgproc.threshold(hsv_ref_dark, hsv_ref_dark,120,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_dark, hsv_com_dark,120,255, Imgproc.THRESH_BINARY);
 		 
 		 Mat ref_hist = new Mat();
 		 Mat com_hist = new Mat();
@@ -276,6 +285,10 @@ public class TestingFile{
 			 status.setText("Object");
 			 status.setForeground(Color.GREEN);
 		 }
+		 else if (hist_compare(hsv_ref_dark, hsv_com_dark) > 120){
+			 status.setText("Object");
+			 status.setForeground(Color.GREEN);
+		 }
 		 else{
 			 status.setText("No Object");
 			 status.setForeground(Color.RED);
@@ -300,7 +313,7 @@ public class TestingFile{
 	 }
 	 
 	 ///////////////////////////////////////////////////////////////////
-	 //		Compares Any Two Histograms
+	 //		Compares Any Two Histograms0
 	 ///////////////////////////////////////////////////////////////////
 	 
 	 public static double hist_compare(Mat ref, Mat com){
