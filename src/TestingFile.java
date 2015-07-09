@@ -35,6 +35,10 @@ import org.opencv.videoio.VideoCapture;
 
 public class TestingFile{
 	
+	///////////////////////////////////////////////////////////////////
+	//		Outer scope declarations
+	///////////////////////////////////////////////////////////////////
+	
 	static JFrame gui_frame;
 	static JPanel panel;
 	static JButton button;
@@ -71,6 +75,10 @@ public class TestingFile{
 		subtracted_frame = new Mat();
 		setUp();
 	}
+	
+	///////////////////////////////////////////////////////////////////
+	//		Setting up Frame and some variables
+	///////////////////////////////////////////////////////////////////
 	
 	public static void setUp() throws FontFormatException, IOException{
 		gui_frame = new JFrame();
@@ -123,6 +131,10 @@ public class TestingFile{
 		gui_frame.setVisible(true);
 	}
 	
+	///////////////////////////////////////////////////////////////////
+	//		Converts a mat to a buffered image and returns it
+	///////////////////////////////////////////////////////////////////
+	
 	 public static BufferedImage matToBufferedImage(Mat matrix) {  
 	     int cols = matrix.cols();  
 	     int rows = matrix.rows();  
@@ -152,25 +164,33 @@ public class TestingFile{
 	     return image2;  
 	   }
 	 
+	 ///////////////////////////////////////////////////////////////////
+	 //		Opens Camera and Takes a single Reference Picture
+	 ///////////////////////////////////////////////////////////////////
+
 	 public static void takeReferencePicture(){
 		 camera = new VideoCapture(1);
-			camera.open(0);
-			if (!camera.isOpened())
-				System.out.println("Not Open");
-			else
-				System.out.println("Open");
-			camera.read(reference_frame);
-			
-			while(true){
-				if (camera.read(reference_frame)){
-					System.out.println("Frame Obtained");
-					image = matToBufferedImage(reference_frame);
-					break;
-				}
-			}
-			writeImage("reference_image.png", reference_frame);
-		    camera.release();
+		 camera.open(0);
+		 if (!camera.isOpened())
+			 System.out.println("Not Open");
+		 else
+			 System.out.println("Open");
+		 camera.read(reference_frame);
+
+		 while(true){
+			 if (camera.read(reference_frame)){
+				 System.out.println("Frame Obtained");
+				 image = matToBufferedImage(reference_frame);
+				 break;
+			 }
+		 }
+		 writeImage("reference_image.png", reference_frame);
+		 camera.release();
 	 }
+
+	 ///////////////////////////////////////////////////////////////////
+	 //		Opens Camera and takes one Comparison picture
+	 ///////////////////////////////////////////////////////////////////
 	 
 	 public static void takeComparisonPicture(){
 		 camera = new VideoCapture(1);
@@ -191,6 +211,11 @@ public class TestingFile{
 			writeImage("comparison_image.png", comparison_frame);
 		    camera.release();
 	 }
+	
+	 
+	 ///////////////////////////////////////////////////////////////////
+	 //		Compares The reference and Comparison Histograms
+	 ///////////////////////////////////////////////////////////////////
 	 
 	 public static double checkSimilarity(){
 		 hsv_half_down = new Mat();
@@ -208,14 +233,6 @@ public class TestingFile{
 		 Imgproc.cvtColor(comparison_frame, hsv_com_rw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw,175,255, Imgproc.THRESH_BINARY);
 		 Imgproc.threshold(hsv_com_rw, hsv_com_rw,175,255, Imgproc.THRESH_BINARY);
-		 
-//		 Imgproc.erode(reference_frame, hsv_ref_rw, element);
-//		 Imgproc.erode(comparison_frame,  hsv_com_rw, element);
-//		 
-//		 writeImage("hsv_ref_bw_image.png", hsv_ref_bw);
-//		 writeImage("hsv_com_bw_image.png", hsv_com_bw);
-//		 writeImage("hsv_ref_rw_image.png", hsv_ref_rw);
-//		 writeImage("hsv_com_rw_image.png", hsv_com_rw);
 		 
 		 Mat ref_hist = new Mat();
 		 Mat com_hist = new Mat();
@@ -255,8 +272,12 @@ public class TestingFile{
 			 status.setText("Object");
 			 status.setForeground(Color.GREEN);
 		 }
+		 else if (hist_compare(hsv_ref_rw, hsv_com_rw) > 120){
+			 status.setText("Object");
+			 status.setForeground(Color.GREEN);
+		 }
 		 else{
-			 status.setText("no Object");
+			 status.setText("No Object");
 			 status.setForeground(Color.RED);
 		 }
 		 
@@ -278,6 +299,62 @@ public class TestingFile{
 		 
 	 }
 	 
+	 ///////////////////////////////////////////////////////////////////
+	 //		Compares Any Two Histograms
+	 ///////////////////////////////////////////////////////////////////
+	 
+	 public static double hist_compare(Mat ref, Mat com){
+		 Mat ref_hist = new Mat();
+		 Mat com_hist = new Mat();
+		 
+		 java.util.List<Mat> matList = new LinkedList<Mat>();
+		 matList.add(ref);
+		 Mat histogram = new Mat();
+		 MatOfFloat ranges=new MatOfFloat(0,256);
+		 MatOfInt histSize = new MatOfInt(255);
+		 Imgproc.calcHist(
+		                 matList, 
+		                 new MatOfInt(0), 
+		                 new Mat(), 
+		                 ref_hist , 
+		                 histSize , 
+		                 ranges);
+		 matList.remove(0);
+		 matList.add(com);
+		 Imgproc.calcHist(
+                 matList, 
+                 new MatOfInt(0), 
+                 new Mat(), 
+                 com_hist , 
+                 histSize , 
+                 ranges);
+		 double comVal = -1;
+		 for( int i = 0; i < 4; i++ )
+		   { int compare_method = i;
+		     double base_base = Imgproc.compareHist( ref_hist, com_hist, compare_method );
+		     if (i ==1) comVal = base_base;
+		    System.out.printf( " Method [%d] Perfect, Base-Half, Base-Test(1), Base-Test(2) : %f,  \n", i, base_base);
+		  }
+		 
+		 double base_base = Imgproc.compareHist( ref_hist, com_hist, 1);
+		 
+		 if (base_base > 120){
+			 status.setText("Object");
+			 status.setForeground(Color.GREEN);
+		 }
+		 else{
+			 status.setText("no Object");
+			 status.setForeground(Color.RED);
+		 }
+		 
+		 bar.setValue((int) comVal);
+		 return comVal;
+	 }
+	 
+	 ///////////////////////////////////////////////////////////////////
+	 //		Makes a Histogram from a mat
+	 ///////////////////////////////////////////////////////////////////
+	 
 	 public static Mat histogram(Mat img,Mat out) // zwraca histogram obrazu
 	 {
 	     Mat src = new Mat(img.height(), img.width(), CvType.CV_8UC2);
@@ -291,6 +368,10 @@ public class TestingFile{
 	     //writeImage("C:/users/mcatoen/desktop/pictures/histogeam.png", b_hist);
 	     return b_hist;
 	 }
+	 
+	 ///////////////////////////////////////////////////////////////////
+	 //		Initializes all buttons and their click listening
+	 ///////////////////////////////////////////////////////////////////
 	 
 	 public static void makeButtons(){
 		 button = new JButton();
