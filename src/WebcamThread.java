@@ -171,10 +171,7 @@ public class WebcamThread implements Runnable{
 		
 		status.setText(TestingFile.status.getText());
 		
-		if (similarity < 150)
-			status.setForeground(Color.RED);
-		else
-			status.setForeground(Color.GREEN);
+		status.setForeground(TestingFile.status.getForeground());
 	}
 	
 	public void trackImage(){
