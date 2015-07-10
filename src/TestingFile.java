@@ -40,6 +40,11 @@ public class TestingFile{
 	//		Outer scope declarations
 	///////////////////////////////////////////////////////////////////
 	
+	static final int HIGH_THRESH = 175;
+	static final int MED_THRESH = 150;
+	static final int LOW_THRESH = 130;
+	static final int COM_THRESH = 150;
+	
 	static JFrame gui_frame;
 	static JPanel panel;
 	static JPanel subPanel [];
@@ -241,19 +246,19 @@ public class TestingFile{
 		 hsv_com_dark = new Mat();
 		 
 		 Imgproc.cvtColor(reference_frame, hsv_ref_bw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_bw, hsv_ref_bw,150,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_ref_bw, hsv_ref_bw, MED_THRESH,255, Imgproc.THRESH_BINARY);
 		 Imgproc.cvtColor(comparison_frame, hsv_com_bw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_com_bw, hsv_com_bw,150,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_bw, hsv_com_bw, MED_THRESH,255, Imgproc.THRESH_BINARY);
 		 
 		 Imgproc.cvtColor(reference_frame, hsv_ref_rw, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.cvtColor(comparison_frame, hsv_com_rw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw,175,255, Imgproc.THRESH_BINARY);
-		 Imgproc.threshold(hsv_com_rw, hsv_com_rw,175,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw, HIGH_THRESH,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_rw, hsv_com_rw, HIGH_THRESH,255, Imgproc.THRESH_BINARY);
 		 
 		 Imgproc.cvtColor(reference_frame, hsv_ref_dark, Imgproc.COLOR_RGB2GRAY);
 		 Imgproc.cvtColor(comparison_frame, hsv_com_dark, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_dark, hsv_ref_dark,120,255, Imgproc.THRESH_BINARY);
-		 Imgproc.threshold(hsv_com_dark, hsv_com_dark,120,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_ref_dark, hsv_ref_dark, LOW_THRESH,255, Imgproc.THRESH_BINARY);
+		 Imgproc.threshold(hsv_com_dark, hsv_com_dark, LOW_THRESH,255, Imgproc.THRESH_BINARY);
 		 
 		 Mat ref_hist = new Mat();
 		 Mat com_hist = new Mat();
@@ -284,26 +289,29 @@ public class TestingFile{
 		   { int compare_method = i;
 		     double base_base = Imgproc.compareHist( ref_hist, com_hist, compare_method );
 		     if (i ==1) comVal = base_base;
-		    System.out.printf( " Method [%d] Perfect, Base-Half, Base-Test(1), Base-Test(2) : %f,  \n", i, base_base);
 		  }
 		 
 		 double base_base = Imgproc.compareHist( ref_hist, com_hist, 1);
 		 
-		 if (base_base > 120){
+		 if (base_base > COM_THRESH){
 			 status.setText("Object");
 			 status.setForeground(Color.GREEN);
+			 System.out.println("Medium Caught");
 		 }
-		 else if (hist_compare(hsv_ref_rw, hsv_com_rw) > 120){
+		 else if (hist_compare(hsv_ref_rw, hsv_com_rw) > COM_THRESH){
 			 status.setText("Object");
 			 status.setForeground(Color.GREEN);
+			 System.out.println("Medium didn't catch");
 		 }
-		 else if (hist_compare(hsv_ref_dark, hsv_com_dark) > 120){
+		 else if (hist_compare(hsv_ref_dark, hsv_com_dark) > COM_THRESH){
 			 status.setText("Object");
 			 status.setForeground(Color.GREEN);
+			 System.out.println("Dark didn't catch");
 		 }
 		 else{
 			 status.setText("No Object");
 			 status.setForeground(Color.RED);
+			 System.out.println("------------------------------");
 		 }
 		 
 		 bar.setValue((int) comVal);
@@ -358,7 +366,6 @@ public class TestingFile{
 		   { int compare_method = i;
 		     double base_base = Imgproc.compareHist( ref_hist, com_hist, compare_method );
 		     if (i ==1) comVal = base_base;
-		    System.out.printf( " Method [%d] Perfect, Base-Half, Base-Test(1), Base-Test(2) : %f,  \n", i, base_base);
 		  }
 		 
 		 double base_base = Imgproc.compareHist( ref_hist, com_hist, 1);

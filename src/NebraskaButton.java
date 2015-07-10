@@ -275,21 +275,14 @@ public class NebraskaButton extends JButton
     }
   }
   ////////////////////////////////////////////////
-  public void keyReleased(KeyEvent e){}
-  public void keyTyped(KeyEvent e){}
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-  public static void main(String[] args){
-    JFrame frame = new JFrame("Nebraska Button Tester");
-
-    frame.getContentPane().setLayout(new FlowLayout());
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    frame.getContentPane().add(new NebraskaButton("OK", 100));
-    frame.getContentPane().add(new NebraskaButton("Cancel", 100));
-    frame.getContentPane().add(new NebraskaButton("Help", 100));
-
-    frame.pack();
-    frame.setVisible(true);
-  }
+@Override
+public void keyReleased(KeyEvent arg0) {
+	// TODO Auto-generated method stub
+	
+}
+@Override
+public void keyTyped(KeyEvent arg0) {
+	// TODO Auto-generated method stub
+	
+}
 }
