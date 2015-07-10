@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -35,7 +36,7 @@ public class WebcamThread implements Runnable{
 	static JPanel [] subPanel;
 	static JLabel label, status, title, comparison, dark_comparison;
 	static BufferedImage image, image2, image3;
-	static JButton takeRefPic;
+	static NebraskaButton takeRefPic;
 	static Graphics g;
 	static boolean run;
 	double similarity;
@@ -114,13 +115,15 @@ public class WebcamThread implements Runnable{
 	        }
 	    });
 	    
-	    takeRefPic = new JButton();
+	    takeRefPic = new NebraskaButton("Take Reference Picture", 300);
 	    takeRefPic.setText("Take Reference Picture");
 	    takeRefPic.addActionListener(new ActionListener(){
 	    	public void actionPerformed(ActionEvent e){
 	    		taking = true;
 			}
 	    });
+	    
+	    takeRefPic.setFont(TestingFile.font.deriveFont(Font.PLAIN, 18));
 	    
 	    title = new JLabel();
 		title.setText("Real Time Detection");
@@ -131,6 +134,7 @@ public class WebcamThread implements Runnable{
 		comparison = new JLabel();
 		dark_comparison = new JLabel();
 		status = new JLabel();
+		status.setFont(TestingFile.font.deriveFont(Font.PLAIN, 18));
 		status.setText("STATUS");
 		status.setFont(new Font(status.getFont().getName(), Font.PLAIN, 24));
 		
@@ -165,10 +169,12 @@ public class WebcamThread implements Runnable{
 	public void checkSimilarityRT(){
 		similarity = TestingFile.checkSimilarity();
 		
+		status.setText(TestingFile.status.getText());
+		
 		if (similarity < 150)
-			status.setText("No Object");
+			status.setForeground(Color.RED);
 		else
-			status.setText("Object Present");
+			status.setForeground(Color.GREEN);
 	}
 	
 	public void trackImage(){

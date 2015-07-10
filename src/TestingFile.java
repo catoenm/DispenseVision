@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -41,11 +42,10 @@ public class TestingFile{
 	
 	static JFrame gui_frame;
 	static JPanel panel;
-	static JButton button;
-	static JButton button2;
-	static JButton next;
-	static JButton simulation;
-	static JButton openWebcam;
+	static JPanel subPanel [];
+	static NebraskaButton button;
+	static NebraskaButton button2;
+	static NebraskaButton openWebcam;
 	static JLabel title;
 	static JLabel status;
 	static JList list;
@@ -103,7 +103,7 @@ public class TestingFile{
 		
 		status = new JLabel();
 		status.setText("STATUS");
-		status.setFont(new Font(status.getFont().getName(), Font.PLAIN, 24));
+		status.setFont(font.deriveFont(Font.PLAIN, 24));
 		
 		panel = new JPanel();
 		
@@ -116,19 +116,31 @@ public class TestingFile{
 		bar.setForeground(Color.BLACK);
 		bar.setValue(1000);
 		
-		panel.add(title);
-		panel.add(Box.createRigidArea(new Dimension(0, 20)));
+		subPanel = new JPanel [10];
+		for (int i = 0; i < 10; i++)
+			subPanel [i] = new JPanel();
+		
+		subPanel[0].add(title);
+		subPanel[1].add(button);
+		subPanel[3].add(button2);
+		subPanel[2].add(openWebcam);
+		subPanel[5].add(status);
+		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(button);
-		panel.add(Box.createRigidArea(new Dimension(0, 20)));
-		panel.add(button2);
-		panel.add(Box.createRigidArea(new Dimension(0, 20)));
-		panel.add(openWebcam);
-		panel.add(Box.createRigidArea(new Dimension(0, 20)));
+		panel.setOpaque(true);
+		
+		panel.add(subPanel[0]);
+		panel.add(subPanel[1]);
+		panel.add(subPanel[3]);
+		panel.add(subPanel[2]);
 		panel.add(scroller);
-		panel.add(status);
+		panel.add(subPanel[5]);
 		panel.add(bar);
 		
+		panel.setBackground(Color.WHITE);
+		panel.repaint();
+		
+		gui_frame.getContentPane().setBackground(Color.WHITE);
 		gui_frame.add(panel);
 		gui_frame.setVisible(true);
 	}
@@ -387,9 +399,8 @@ public class TestingFile{
 	 ///////////////////////////////////////////////////////////////////
 	 
 	 public static void makeButtons(){
-		 button = new JButton();
-			button.setText("Take Reference Picture   ");
-			button.setSize(200, 50);
+		 button = new NebraskaButton("Take Reference Picture", 300);
+			button.setText("Take Reference Picture");
 			button.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					takeReferencePicture();
@@ -397,9 +408,10 @@ public class TestingFile{
 				}
 			});
 			
-			button2 = new JButton();
-			button2.setText("        Check for Object        ");
-			button2.setSize(200, 50);
+			button.setFont(font.deriveFont(Font.PLAIN, 18));
+			
+			button2 = new NebraskaButton("Take Comparison Picture", 300);
+			button2.setText("Check for Object");
 			button2.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					takeComparisonPicture();
@@ -419,9 +431,10 @@ public class TestingFile{
 				}
 			});
 			
-			openWebcam = new JButton();
-			openWebcam.setText("          Open Webcam          ");
-			openWebcam.setSize(200, 50);
+			button2.setFont(font.deriveFont(Font.PLAIN, 18));
+			
+			openWebcam = new NebraskaButton("Real Time Recognition", 300);
+			openWebcam.setText("Open Webcam");
 			openWebcam.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					WebcamThread webcamThread = new WebcamThread();
@@ -429,5 +442,7 @@ public class TestingFile{
 					output.add(0, "Webcam Open");
 				}
 			});
+			
+			openWebcam.setFont(font.deriveFont(Font.PLAIN, 18));
 	 }
 }
