@@ -43,7 +43,7 @@ public class TestingFile{
 	static final int HIGH_THRESH = 175;
 	static final int MED_THRESH = 150;
 	static final int LOW_THRESH = 130;
-	static final int COM_THRESH = 150;
+	static final int COM_THRESH = 500;
 	
 	static JFrame gui_frame;
 	static JPanel panel;
@@ -81,6 +81,7 @@ public class TestingFile{
 		comparison_frame = new Mat();
 		subtracted_frame = new Mat();
 		setUp();
+		output.add(0, "Initialized");
 	}
 	
 	///////////////////////////////////////////////////////////////////
@@ -93,7 +94,7 @@ public class TestingFile{
 		gui_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gui_frame.setTitle("DispenseVision");
 		
-		File file = new File("BAUHS93.ttf");
+		File file = new File("calibrib.ttf");
 		font = Font.createFont(Font.TRUETYPE_FONT, file);
 		
 		title = new JLabel();
