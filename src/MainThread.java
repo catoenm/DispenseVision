@@ -30,20 +30,22 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
-public class TestingFile{
+public class MainThread{
 	
 	///////////////////////////////////////////////////////////////////
 	//		Outer scope declarations
 	///////////////////////////////////////////////////////////////////
 	
-	static final int HIGH_THRESH = 175;
-	static final int MED_THRESH = 150;
-	static final int LOW_THRESH = 130;
-	static final int COM_THRESH = 500;
+	static double boundaries [][] = {
+			{17, 15, 100}, {50, 56, 200},
+			{86, 31, 4}, {220, 88, 50},
+			{25, 146, 190}, {62, 174, 250},
+	};
 	
 	static JFrame gui_frame;
 	static JPanel panel;
@@ -59,16 +61,7 @@ public class TestingFile{
 	static BufferedImage image;
 	static VideoCapture camera;
 	static DefaultListModel output;
-	static Mat reference_frame;
-	static Mat comparison_frame;
-	static Mat subtracted_frame;
-	static Mat hsv_half_down;
-	static Mat hsv_ref_bw;
-	static Mat hsv_com_bw;
-	static Mat hsv_ref_rw;
-	static Mat hsv_com_rw;
-	static Mat hsv_ref_dark;
-	static Mat hsv_com_dark;
+	static Mat comparison_frame, red_frame, blue_frame, yellow_frame;
 	final static int NUMBER = 10;
 	static boolean nextButtonPressed = false;
 	static Font font;
@@ -77,9 +70,10 @@ public class TestingFile{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Mat mat = Mat.eye(3,  3, CvType.CV_8UC1);
 		System.out.println("mat = " + mat.dump());
-		reference_frame = new Mat();
 		comparison_frame = new Mat();
-		subtracted_frame = new Mat();
+		red_frame = new Mat();
+		blue_frame = new Mat();
+		yellow_frame = new Mat();
 		setUp();
 		output.add(0, "Initialized");
 	}
@@ -127,7 +121,6 @@ public class TestingFile{
 			subPanel [i] = new JPanel();
 		
 		subPanel[0].add(title);
-		subPanel[1].add(button);
 		subPanel[3].add(button2);
 		subPanel[2].add(openWebcam);
 		subPanel[5].add(status);
@@ -136,7 +129,6 @@ public class TestingFile{
 		panel.setOpaque(true);
 		
 		panel.add(subPanel[0]);
-		panel.add(subPanel[1]);
 		panel.add(subPanel[3]);
 		panel.add(subPanel[2]);
 		panel.add(scroller);
@@ -195,16 +187,16 @@ public class TestingFile{
 			 System.out.println("Not Open");
 		 else
 			 System.out.println("Open");
-		 camera.read(reference_frame);
+		 camera.read(comparison_frame);
 
 		 while(true){
-			 if (camera.read(reference_frame)){
+			 if (camera.read(comparison_frame)){
 				 System.out.println("Frame Obtained");
-				 image = matToBufferedImage(reference_frame);
+				 image = matToBufferedImage(comparison_frame);
 				 break;
 			 }
 		 }
-		 writeImage("reference_image.png", reference_frame);
+		 writeImage("reference_image.png", comparison_frame);
 		 camera.release();
 	 }
 
@@ -232,92 +224,9 @@ public class TestingFile{
 		    camera.release();
 	 }
 	
-	 
 	 ///////////////////////////////////////////////////////////////////
-	 //		Compares The reference and Comparison Histograms
+	 //		Writes any image to a file
 	 ///////////////////////////////////////////////////////////////////
-	 
-	 public static double checkSimilarity(){
-		 hsv_half_down = new Mat();
-		 hsv_ref_bw = new Mat();
-		 hsv_com_bw = new Mat();
-		 hsv_ref_rw = new Mat();
-		 hsv_com_rw = new Mat();
-		 hsv_ref_dark = new Mat();
-		 hsv_com_dark = new Mat();
-		 
-		 Imgproc.cvtColor(reference_frame, hsv_ref_bw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_bw, hsv_ref_bw, MED_THRESH,255, Imgproc.THRESH_BINARY);
-		 Imgproc.cvtColor(comparison_frame, hsv_com_bw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_com_bw, hsv_com_bw, MED_THRESH,255, Imgproc.THRESH_BINARY);
-		 
-		 Imgproc.cvtColor(reference_frame, hsv_ref_rw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.cvtColor(comparison_frame, hsv_com_rw, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_rw, hsv_ref_rw, HIGH_THRESH,255, Imgproc.THRESH_BINARY);
-		 Imgproc.threshold(hsv_com_rw, hsv_com_rw, HIGH_THRESH,255, Imgproc.THRESH_BINARY);
-		 
-		 Imgproc.cvtColor(reference_frame, hsv_ref_dark, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.cvtColor(comparison_frame, hsv_com_dark, Imgproc.COLOR_RGB2GRAY);
-		 Imgproc.threshold(hsv_ref_dark, hsv_ref_dark, LOW_THRESH,255, Imgproc.THRESH_BINARY);
-		 Imgproc.threshold(hsv_com_dark, hsv_com_dark, LOW_THRESH,255, Imgproc.THRESH_BINARY);
-		 
-		 Mat ref_hist = new Mat();
-		 Mat com_hist = new Mat();
-		 
-		 java.util.List<Mat> matList = new LinkedList<Mat>();
-		 matList.add(hsv_ref_bw);
-		 Mat histogram = new Mat();
-		 MatOfFloat ranges=new MatOfFloat(0,256);
-		 MatOfInt histSize = new MatOfInt(255);
-		 Imgproc.calcHist(
-		                 matList, 
-		                 new MatOfInt(0), 
-		                 new Mat(), 
-		                 ref_hist , 
-		                 histSize , 
-		                 ranges);
-		 matList.remove(0);
-		 matList.add(hsv_com_bw);
-		 Imgproc.calcHist(
-                 matList, 
-                 new MatOfInt(0), 
-                 new Mat(), 
-                 com_hist , 
-                 histSize , 
-                 ranges);
-		 double comVal = -1;
-		 for( int i = 0; i < 4; i++ )
-		   { int compare_method = i;
-		     double base_base = Imgproc.compareHist( ref_hist, com_hist, compare_method );
-		     if (i ==1) comVal = base_base;
-		  }
-		 
-		 double base_base = Imgproc.compareHist( ref_hist, com_hist, 1);
-		 
-		 if (base_base > COM_THRESH){
-			 status.setText("Object");
-			 status.setForeground(Color.GREEN);
-			 System.out.println("Medium Caught");
-		 }
-		 else if (hist_compare(hsv_ref_rw, hsv_com_rw) > COM_THRESH){
-			 status.setText("Object");
-			 status.setForeground(Color.GREEN);
-			 System.out.println("Medium didn't catch");
-		 }
-		 else if (hist_compare(hsv_ref_dark, hsv_com_dark) > COM_THRESH){
-			 status.setText("Object");
-			 status.setForeground(Color.GREEN);
-			 System.out.println("Dark didn't catch");
-		 }
-		 else{
-			 status.setText("No Object");
-			 status.setForeground(Color.RED);
-			 System.out.println("------------------------------");
-		 }
-		 
-		 bar.setValue((int) comVal);
-		 return comVal;
-	 }
 	 
 	 public static void writeImage(String path, Mat mat){
 		 
@@ -331,57 +240,6 @@ public class TestingFile{
 			 e.printStackTrace();
 		 }
 		 
-	 }
-	 
-	 ///////////////////////////////////////////////////////////////////
-	 //		Compares Any Two Histograms0
-	 ///////////////////////////////////////////////////////////////////
-	 
-	 public static double hist_compare(Mat ref, Mat com){
-		 Mat ref_hist = new Mat();
-		 Mat com_hist = new Mat();
-		 
-		 java.util.List<Mat> matList = new LinkedList<Mat>();
-		 matList.add(ref);
-		 Mat histogram = new Mat();
-		 MatOfFloat ranges=new MatOfFloat(0,256);
-		 MatOfInt histSize = new MatOfInt(255);
-		 Imgproc.calcHist(
-		                 matList, 
-		                 new MatOfInt(0), 
-		                 new Mat(), 
-		                 ref_hist , 
-		                 histSize , 
-		                 ranges);
-		 matList.remove(0);
-		 matList.add(com);
-		 Imgproc.calcHist(
-                 matList, 
-                 new MatOfInt(0), 
-                 new Mat(), 
-                 com_hist , 
-                 histSize , 
-                 ranges);
-		 double comVal = -1;
-		 for( int i = 0; i < 4; i++ )
-		   { int compare_method = i;
-		     double base_base = Imgproc.compareHist( ref_hist, com_hist, compare_method );
-		     if (i ==1) comVal = base_base;
-		  }
-		 
-		 double base_base = Imgproc.compareHist( ref_hist, com_hist, 1);
-		 
-		 if (base_base > 120){
-			 status.setText("Object");
-			 status.setForeground(Color.GREEN);
-		 }
-		 else{
-			 status.setText("no Object");
-			 status.setForeground(Color.RED);
-		 }
-		 
-		 bar.setValue((int) comVal);
-		 return comVal;
 	 }
 	 
 	 ///////////////////////////////////////////////////////////////////
@@ -407,34 +265,12 @@ public class TestingFile{
 	 ///////////////////////////////////////////////////////////////////
 	 
 	 public static void makeButtons(){
-		 button = new NebraskaButton("Take Reference Picture", 300);
-			button.setText("Take Reference Picture");
-			button.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e){
-					takeReferencePicture();
-					output.add(0, "Reference Picture Taken");
-				}
-			});
 			
-			button.setFont(font.deriveFont(Font.PLAIN, 18));
-			
-			button2 = new NebraskaButton("Take Comparison Picture", 300);
-			button2.setText("Check for Object");
+			button2 = new NebraskaButton("Take Picture", 300);
 			button2.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					takeComparisonPicture();
-					output.add(0, "Comparison Picture Taken");
-					Core.absdiff(reference_frame, comparison_frame, subtracted_frame);
-					image = matToBufferedImage(subtracted_frame);
-					File outputfile = new File("subtracted_image.png");
-				    try {
-						ImageIO.write(image, "png", outputfile);
-					} catch (IOException err) {
-						// TODO Auto-generated catch block
-						err.printStackTrace();
-					}
-				    
-				    output.add(0, "Histogram Comparison: " + Math.round(checkSimilarity()));
+					output.add(0, "Picture Taken");
 				    
 				}
 			});
@@ -452,5 +288,22 @@ public class TestingFile{
 			});
 			
 			openWebcam.setFont(font.deriveFont(Font.PLAIN, 18));
+	 }
+	 
+	 public static Mat detectRed(Mat input){
+		 Scalar lower = new Scalar(boundaries[0]);
+		 Scalar upper = new Scalar(boundaries[1]);
+		 Core.inRange(input, lower, upper, red_frame);
+		 Imgproc.cvtColor(red_frame, red_frame, Imgproc.COLOR_GRAY2RGB);
+		 Core.bitwise_and(input, red_frame, red_frame);
+		 return red_frame;
+	 }
+	 public static Mat detectYellow(Mat input){
+		 Mat output = new Mat();
+		 return output;
+	 }
+	 public static Mat detectGreen(Mat input){
+		 Mat output = new Mat();
+		 return output;
 	 }
 }
