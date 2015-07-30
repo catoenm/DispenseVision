@@ -204,10 +204,10 @@ public class NebraskaButton extends JButton
     g2.setRenderingHints(hints);
 
     if(getModel().isArmed()){
-      g2.setColor(new Color(204, 204, 0));
+      g2.setColor(new Color(204, 0, 0));
     }
     else{
-       g2.setColor(Color.yellow);
+       g2.setColor(Color.red);
     }
 
     g2.fill(m_areaFill);

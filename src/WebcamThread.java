@@ -70,6 +70,10 @@ public class WebcamThread implements Runnable{
 					image = MainThread.matToBufferedImage(MainThread.red_frame);
 					ImageIcon icon = new ImageIcon(getScaledImage(image, 640, 480));
 					label.setIcon(icon);
+					
+					image = MainThread.matToBufferedImage(MainThread.comparison_frame);
+					icon = new ImageIcon(getScaledImage(image, 320, 240));
+					dark_comparison.setIcon(icon);
 				}
 			}
 		}
@@ -101,6 +105,7 @@ public class WebcamThread implements Runnable{
 	    title = new JLabel();
 		title.setText("Real Time Detection");
 		title.setFont(MainThread.font.deriveFont(Font.PLAIN, 32));
+		title.setForeground(Color.red);
 		
 		label = new JLabel();
 //		label.setText("Hello");
@@ -114,6 +119,7 @@ public class WebcamThread implements Runnable{
 		subPanel = new JPanel [3];
 		for (int i = 0; i < 3; i++){
 			subPanel[i] = new JPanel();
+			subPanel[i].setBackground(new Color(51, 51, 51));
 		}
 		subPanel[0].add(comparison);
 		subPanel[0].add(label);

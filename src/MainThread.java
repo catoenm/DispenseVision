@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -9,7 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -30,10 +32,12 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
+import org.opencv.core.MatOfPoint;
 
 public class MainThread{
 	
@@ -42,7 +46,7 @@ public class MainThread{
 	///////////////////////////////////////////////////////////////////
 	
 	static double boundaries [][] = {
-			{17, 15, 100}, {50, 56, 200},
+			{0, 15, 130}, {120, 120, 220},
 			{86, 31, 4}, {220, 88, 50},
 			{25, 146, 190}, {62, 174, 250},
 	};
@@ -65,6 +69,7 @@ public class MainThread{
 	final static int NUMBER = 10;
 	static boolean nextButtonPressed = false;
 	static Font font;
+	static ColorBlobDetector mDetector;
 	
 	public static void main(String [] args) throws FontFormatException, IOException{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -76,6 +81,7 @@ public class MainThread{
 		yellow_frame = new Mat();
 		setUp();
 		output.add(0, "Initialized");
+		mDetector = new ColorBlobDetector();
 	}
 	
 	///////////////////////////////////////////////////////////////////
@@ -94,6 +100,7 @@ public class MainThread{
 		title = new JLabel();
 		title.setText("Dispense Product Detection");
 		title.setFont(font.deriveFont(Font.PLAIN, 32));
+		title.setForeground(Color.red);
 		
 		output = new DefaultListModel();
 		
@@ -117,8 +124,10 @@ public class MainThread{
 		bar.setValue(1000);
 		
 		subPanel = new JPanel [10];
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++){
 			subPanel [i] = new JPanel();
+			subPanel [i].setBackground(new Color(51, 51, 51));
+		}
 		
 		subPanel[0].add(title);
 		subPanel[3].add(button2);
@@ -294,8 +303,25 @@ public class MainThread{
 		 Scalar lower = new Scalar(boundaries[0]);
 		 Scalar upper = new Scalar(boundaries[1]);
 		 Core.inRange(input, lower, upper, red_frame);
-		 Imgproc.cvtColor(red_frame, red_frame, Imgproc.COLOR_GRAY2RGB);
-		 Core.bitwise_and(input, red_frame, red_frame);
+//		 Imgproc.cvtColor(red_frame, red_frame, Imgproc.COLOR_GRAY2RGB);
+//		 Imgproc.GaussianBlur(red_frame, red_frame, new Size(3, 3), 0, 0);
+//		 Core.bitwise_and(input, red_frame, red_frame);
+//		 mDetector.process(red_frame);
+//		 System.out.println(contours.size());
+//		 Imgproc.drawContours(red_frame, contours, -1, new Scalar(255, 0, 0, 255));
+		 Mat erode = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5,5));
+	        Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(7,7));
+	        Imgproc.erode(red_frame, red_frame, erode);
+
+	        Imgproc.dilate(red_frame, red_frame, dilate);
+		 
+		 List<MatOfPoint> contours = new ArrayList<>();
+		 Mat mat = new Mat();
+	        Imgproc.findContours(red_frame, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+	        Imgproc.drawContours(red_frame, contours, -1, new Scalar(255,255,0));
+	        
+	        System.out.println(contours.size());
+	        
 		 return red_frame;
 	 }
 	 public static Mat detectYellow(Mat input){
