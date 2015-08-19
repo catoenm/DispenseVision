@@ -70,6 +70,8 @@ public class MainThread{
 	static boolean nextButtonPressed = false;
 	static Font font;
 	static ColorBlobDetector mDetector;
+	static int dots, refDots = 0;
+	static List<MatOfPoint> contours;
 	
 	public static void main(String [] args) throws FontFormatException, IOException{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -299,7 +301,7 @@ public class MainThread{
 			openWebcam.setFont(font.deriveFont(Font.PLAIN, 18));
 	 }
 	 
-	 public static Mat detectRed(Mat input){
+	 public static int detectRed(Mat input){
 		 Scalar lower = new Scalar(boundaries[0]);
 		 Scalar upper = new Scalar(boundaries[1]);
 		 Core.inRange(input, lower, upper, red_frame);
@@ -312,17 +314,16 @@ public class MainThread{
 		 Mat erode = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5,5));
 	        Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(7,7));
 	        Imgproc.erode(red_frame, red_frame, erode);
-
 	        Imgproc.dilate(red_frame, red_frame, dilate);
 		 
-		 List<MatOfPoint> contours = new ArrayList<>();
+		 contours = new ArrayList<>();
+		 
 		 Mat mat = new Mat();
 	        Imgproc.findContours(red_frame, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 	        Imgproc.drawContours(red_frame, contours, -1, new Scalar(255,255,0));
 	        
 	        System.out.println(contours.size());
-	        
-		 return red_frame;
+		 return contours.size();
 	 }
 	 public static Mat detectYellow(Mat input){
 		 Mat output = new Mat();

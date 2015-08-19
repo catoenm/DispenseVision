@@ -36,6 +36,7 @@ public class WebcamThread implements Runnable{
 	static JPanel [] subPanel;
 	static JLabel label, status, title, comparison, dark_comparison, NumberOfDots;
 	static BufferedImage image, image2, image3;
+	static JButton takeRefNum;
 	static NebraskaButton takeRefPic;
 	static Graphics g;
 	static boolean run;
@@ -48,7 +49,7 @@ public class WebcamThread implements Runnable{
 	double minDist;
 	
 	int count;
-	
+	int dots;
 	
 	@Override
 	public void run() {
@@ -65,7 +66,7 @@ public class WebcamThread implements Runnable{
 					
 					MainThread.comparison_frame = webcamImage;
 					
-					MainThread.detectRed(MainThread.comparison_frame);
+					dots = MainThread.detectRed(MainThread.comparison_frame);
 					
 					image = MainThread.matToBufferedImage(MainThread.red_frame);
 					ImageIcon icon = new ImageIcon(getScaledImage(image, 640, 480));
@@ -74,6 +75,8 @@ public class WebcamThread implements Runnable{
 					image = MainThread.matToBufferedImage(MainThread.comparison_frame);
 					icon = new ImageIcon(getScaledImage(image, 320, 240));
 					dark_comparison.setIcon(icon);
+					
+					status.setText(dots + " Scanned");
 				}
 			}
 		}
@@ -107,6 +110,15 @@ public class WebcamThread implements Runnable{
 		title.setFont(MainThread.font.deriveFont(Font.PLAIN, 32));
 		title.setForeground(Color.red);
 		
+		takeRefNum = new NebraskaButton("Grab Number", 300);
+		takeRefNum.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+			    MainThread.refDots = dots;
+			    MainThread.output.add(0,  "Reference Number Achieved: " + MainThread.refDots);
+			    MainThread.output.add(0, MainThread.contours.get(0).size());
+			}
+		});
+		
 		label = new JLabel();
 //		label.setText("Hello");
 		comparison = new JLabel();
@@ -115,9 +127,10 @@ public class WebcamThread implements Runnable{
 		status.setFont(MainThread.font.deriveFont(Font.PLAIN, 18));
 		status.setText("STATUS");
 		status.setFont(new Font(status.getFont().getName(), Font.PLAIN, 24));
+		status.setForeground(Color.red);
 		
-		subPanel = new JPanel [3];
-		for (int i = 0; i < 3; i++){
+		subPanel = new JPanel [4];
+		for (int i = 0; i < 4; i++){
 			subPanel[i] = new JPanel();
 			subPanel[i].setBackground(new Color(51, 51, 51));
 		}
@@ -126,11 +139,13 @@ public class WebcamThread implements Runnable{
 		subPanel[0].add(dark_comparison);
 		subPanel[1].add(title);
 		subPanel[2].add(status);
+		subPanel[3].add(takeRefNum);
 		
 		panel = new WebcamPanel();
 		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(subPanel[1]);
+		panel.add(subPanel[3]);
 		panel.add(subPanel[0]);
 		panel.add(subPanel[2]);
 		frame.add(panel);
