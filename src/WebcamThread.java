@@ -19,14 +19,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.opencv.core.DMatch;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
-import org.opencv.videoio.VideoCapture;
+import org.opencv.highgui.VideoCapture; 
 
 
 public class WebcamThread implements Runnable{
@@ -67,8 +66,9 @@ public class WebcamThread implements Runnable{
 					MainThread.comparison_frame = webcamImage;
 					
 					dots = MainThread.detectRed(MainThread.comparison_frame);
+					MainThread.detectSquares(MainThread.comparison_frame);
 					
-					image = MainThread.matToBufferedImage(MainThread.red_frame);
+					image = MainThread.matToBufferedImage(MainThread.square_frame);
 					ImageIcon icon = new ImageIcon(getScaledImage(image, 640, 480));
 					label.setIcon(icon);
 					
